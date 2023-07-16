@@ -32,7 +32,7 @@ cmsenv
 ### Get customized NanoAOD producers
 
 ```bash
-git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-ak15tagger-UL
+git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-part-UL
 ```
 
 ### Use an updated onnxruntime package (before compiling the code)
@@ -44,7 +44,7 @@ PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
 ### Get the ParT model
 
 ```bash
-wget https://coli.web.cern.ch/coli/tmp/.231117-195737_ak15_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak15/V02/model.onnx
+wget https://coli.web.cern.ch/coli/tmp/.240120-181907_ak8_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak8/V02/model.onnx
 ```
 
 ### Compile
