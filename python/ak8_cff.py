@@ -62,6 +62,54 @@ def addParticleNetAK8(process, runParticleNet=False, runParticleNetMD=True):
     return process
 
 
+def getCustomTaggerDiscriminatorsAK8(process, name):
+    customTaggersAvailableDict = {
+        'DeepHWWV1': {
+            'cff_path': 'PhysicsTools.NanoTuples.hwwTagger.pfMassDecorrelatedDeepHWWV1_cff',
+            'disc_name': '_pfMassDecorrelatedDeepHWWV1JetTagsAll',
+            'nano_branch_name': 'deepHWWMDV1',
+        },
+        'InclParticleTransformerV1': {
+            'cff_path': 'PhysicsTools.NanoTuples.hwwTagger.pfMassDecorrelatedInclParticleTransformerV1_cff',
+            'disc_name': '_pfMassDecorrelatedInclParticleTransformerV1JetTagsAll',
+            'nano_branch_name': 'inclParTMDV1',
+        },
+        'InclParticleTransformerV2': {
+            'cff_path': 'PhysicsTools.NanoTuples.hwwTagger.pfMassDecorrelatedInclParticleTransformerV2_cff',
+            'disc_name': '_pfMassDecorrelatedInclParticleTransformerV2JetTagsAll',
+            'nano_branch_name': 'inclParTMDV2',
+        },
+    }
+    if name not in customTaggersAvailableDict:
+        raise ValueError("the specified tagger '%s' does not exist." % name)
+
+    cfg = customTaggersAvailableDict[name]
+    mod = __import__(cfg['cff_path'], globals(), locals(), [cfg['disc_name']], -1)
+    btagDiscriminators = getattr(mod, cfg['disc_name'])
+
+    # add variables to NanoAOD FatJet table
+    for prob in btagDiscriminators: # include all raw scores and tagger discriminants
+        name = cfg['nano_branch_name'] + '_' + prob.split(':')[1]
+        setattr(process.fatJetTable.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
+
+    return btagDiscriminators
+
+
+def addCustomTaggerAK8(process, tag_discs):
+    from PhysicsTools.NanoTuples.jetTools import updateJetCollection as updateJetCollectionCustom
+    JETCorrLevels = ['L2Relative', 'L3Absolute', 'L2L3Residual']
+    # inference the tagger score
+    updateJetCollectionCustom(
+        process,
+        jetSource = cms.InputTag('selectedUpdatedPatJetsAK8WithDeepInfo'),
+        rParam = 0.8,
+        jetCorrections = ('AK8PFPuppi', cms.vstring(JETCorrLevels), 'None'),
+        btagDiscriminators = tag_discs,
+        postfix='AK8WithCustomTagger',
+    )
+    process.jetCorrFactorsAK8.src = "selectedUpdatedPatJetsAK8WithCustomTagger"
+    process.updatedJetsAK8.jetSource = "selectedUpdatedPatJetsAK8WithCustomTagger"
+
 
 # ---------------------------------------------------------
 def setupCustomizedAK8(process, runOnMC=False, path=None):

@@ -4,7 +4,7 @@ from PhysicsTools.NanoAOD.common_cff import *
 # ---------------------------------------------------------
 
 
-def setupAK15(process, runOnMC=False, path=None, runParticleNet=False, runParticleNetMD=True):
+def setupAK15(process, runOnMC=False, path=None, runParticleNet=False, runParticleNetMD=True, customAK15Taggers=[]):
     # recluster Puppi jets
     bTagDiscriminators = [
         'pfJetProbabilityBJetTags',
@@ -33,15 +33,23 @@ def setupAK15(process, runOnMC=False, path=None, runParticleNet=False, runPartic
         process.ak15GenJetsNoNu.jetPtMin = 100
         process.ak15GenJetsNoNuSoftDrop.jetPtMin = 100
 
-    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    # from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    from PhysicsTools.NanoTuples.jetTools import updateJetCollection as updateJetCollectionCustom
     from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfMassDecorrelatedParticleNetJetTagsProbs as pfMassDecorrelatedParticleNetJetTagsProbs
 
     if runParticleNet:
         bTagDiscriminators += pfParticleNetJetTagsProbs
     if runParticleNetMD:
         bTagDiscriminators += pfMassDecorrelatedParticleNetJetTagsProbs
+    if len(customAK15Taggers) > 0:
+        branchInfo = []
+        for name in customAK15Taggers:
+            disc, bchinfo = getCustomTaggerDiscriminatorsAK15(name)
+            bTagDiscriminators += disc
+            branchInfo += bchinfo
+    print(bTagDiscriminators)
 
-    updateJetCollection(
+    updateJetCollectionCustom(
         process,
         jetSource=cms.InputTag('packedPatJetsAK15PFPuppiSoftDrop'),
         rParam=1.5,
@@ -131,6 +139,11 @@ def setupAK15(process, runOnMC=False, path=None, runParticleNet=False, runPartic
             name = 'ParticleNetMD_' + prob.split(':')[1]
             setattr(process.ak15Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
 
+    # add other AK15 custom taggers
+    if len(customAK15Taggers) > 0:
+        for name, var_info in branchInfo:
+            setattr(process.ak15Table.variables, name, var_info)
+
     process.ak15SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsAK15PFPuppiSoftDropPacked", "SubJets"),
         cut=cms.string(""),
@@ -195,3 +208,27 @@ def setupAK15(process, runOnMC=False, path=None, runParticleNet=False, runPartic
         process.schedule.associate(process.ak15Task)
     else:
         getattr(process, path).associate(process.ak15Task)
+
+
+def getCustomTaggerDiscriminatorsAK15(name):
+    customTaggersAvailableDict = {
+        'InclParticleTransformerAK15V2': {
+            'cff_path': 'PhysicsTools.NanoTuples.hwwTagger.pfMassDecorrelatedInclParticleTransformerV2_cff',
+            'disc_name': '_pfMassDecorrelatedInclParticleTransformerAK15V2JetTagsAllSelected',
+            'nano_branch_name': 'inclParTMDV2',
+        },
+    }
+    if name not in customTaggersAvailableDict:
+        raise ValueError("the specified tagger '%s' does not exist." % name)
+
+    cfg = customTaggersAvailableDict[name]
+    mod = __import__(cfg['cff_path'], globals(), locals(), [cfg['disc_name']], -1)
+    btagDiscriminators = getattr(mod, cfg['disc_name'])
+
+    # variables to store in NanoAOD FatJet table
+    branchInfo = []
+    for prob in btagDiscriminators: # include all raw scores and tagger discriminants
+        name = cfg['nano_branch_name'] + '_' + prob.split(':')[1]
+        branchInfo.append([name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1)])
+
+    return btagDiscriminators, branchInfo
