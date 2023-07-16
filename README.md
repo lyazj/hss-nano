@@ -22,6 +22,7 @@ Customizations:
 ### Set up CMSSW
 
 ```bash
+export SCRAM_ARCH=slc7_amd64_gcc700
 cmsrel CMSSW_10_6_31
 cd CMSSW_10_6_31/src
 cmsenv
@@ -36,7 +37,7 @@ git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-ak15t
 ### Use an updated onnxruntime package (before compiling the code)
 
 ```bash
-pushd $CMSSW_BASE; src/PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh; popd
+PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
 ```
 
 ### Get the ParT model
