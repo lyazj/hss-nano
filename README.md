@@ -22,8 +22,9 @@ Customizations:
 ### Set up CMSSW
 
 ```bash
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=slc7_amd64_gcc700
-cmsrel CMSSW_10_6_31
+[ -r CMSSW_10_6_31 ] || cmsrel CMSSW_10_6_31
 cd CMSSW_10_6_31/src
 cmsenv
 ```
