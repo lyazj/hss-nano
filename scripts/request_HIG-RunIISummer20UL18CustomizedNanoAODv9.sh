@@ -34,6 +34,11 @@ for ID in $(ls /eos/user/l/legao/hss/src/aod/HIG-RunIISummer20UL18/miniaod/ \
     | grep '^HIG-RunIISummer20UL18MiniAODv2-02334_[0-9]\+_[0-9]\+_[0-9]\+\.root$' \
     | grep -o '[0-9]\+_[0-9]\+_[0-9]\+\.root$' \
     | grep -o '[0-9]\+_[0-9]\+_[0-9]\+'); do
+    if [ $(stat --printf=%s \
+        /eos/user/l/legao/hss/src/aod/HIG-RunIISummer20UL18/miniaod/HIG-RunIISummer20UL18MiniAODv2-02334_${ID}.root \
+        ) -lt 1000 ]; then
+        continue
+    fi
     if 2>/dev/null [ $(2>/dev/null stat --printf=%s \
         /eos/user/l/legao/hss/src/aod/HIG-RunIISummer20UL18/nanoaod/HIG-RunIISummer20UL18CustomizedNanoAODv9-02334_${ID}.root \
         ) -ge 1000 ]; then
