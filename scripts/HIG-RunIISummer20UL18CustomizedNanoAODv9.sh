@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Avoid "input: $HOME/.root.mimes, output: $HOME/.root.mimes" error.
+# REF: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCrabFaq
+if [ -z "${HOME}" ]; then
+    export HOME="$(pwd)"
+fi
+
 if [ $# -lt 3 ]; then
     >&2 echo "usage: $(basename "$0") <nevent> <nthread> <file-in> <file-out> <x509up>"
     exit 1
