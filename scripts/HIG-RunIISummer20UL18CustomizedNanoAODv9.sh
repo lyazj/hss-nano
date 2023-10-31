@@ -1,13 +1,14 @@
 #!/bin/bash
 
-if [ $# -lt 2 ]; then
-    >&2 echo "usage: $(basename "$0") <nthread> <file-in> <file-out> <x509up>"
+if [ $# -lt 3 ]; then
+    >&2 echo "usage: $(basename "$0") <nevent> <nthread> <file-in> <file-out> <x509up>"
     exit 1
 fi
-NTHREAD="$1"
-FILEIN="$2"
-FILEOUT="$3"
-X509UP="$4"
+NEVENT="$1"
+NTHREAD="$2"
+FILEIN="$3"
+FILEOUT="$4"
+X509UP="$5"
 if [ -z "${FILEOUT}" ]; then
     FILEOUT="${FILEIN/MiniAODv2/CustomizedNanoAODv9}"
 fi
@@ -35,6 +36,7 @@ scram b -j$(cat /proc/cpuinfo | grep MHz | wc -l)
 # 6_HIG-RunIISummer20UL18CustomizedNanoAODv9-02334.sh
 cmsDriver.py \
     --mc \
+    -n "${NEVENT}" \
     --nThreads "${NTHREAD}" \
     --python_filename HIG-RunIISummer20UL18CustomizedNanoAOD.py \
     --eventcontent NANOAODSIM \
