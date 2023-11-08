@@ -11,7 +11,9 @@ import sample
 
 samples = sample.list_samples()
 
-if len(sys.argv) == 1:
+if len(sys.argv) < 2 or len(sys.argv) > 4:
+    print('Usage: %s [ <prepid> [ <nevent> [ <dryrun> ] ] ]' % os.path.basename(sys.argv[0]))
+    print('Available prepids:')
     for dataset, dataset_samples in samples.items():
         print('-', dataset)
         for prepid in dataset_samples.keys():
@@ -30,7 +32,7 @@ def check_success(fileout):
     except Exception:
         return False
 
-def request(dataset, prepid, sample, target_nevents=None, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD'):
+def request(dataset, prepid, sample, target_nevents=None, dryrun=False, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD'):
     jobstr = '''Universe = vanilla
 Executable = %s
 
@@ -57,25 +59,31 @@ should_transfer_files = NO
 Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
 %s)'''
     executable = os.path.abspath(os.path.join(basedir, 'scripts', 'x509run'))
-    prog = os.path.abspath(os.path.join(basedir, 'scripts', 'run.sh'))
     x509up = generate_x509up()
-    queue = ''
+    prog = os.path.abspath(os.path.join(basedir, 'scripts', 'run.sh'))
+    outdir = os.path.join(outdir, dataset, prepid)
+    logdir = os.path.join(basedir, 'scripts', 'log', dataset, prepid)
     if os.system("mkdir -p '%s' '%s'" % (outdir, logdir)):
         raise RuntimeError('error making directories')
+    queue = ''
     for nevents, filein in sample.select(target_nevents):
         filename = os.path.basename(filein)
-        fileout = os.path.join(outdir, filename)
-        if check_success(fileout): continue
+        fileout = os.path.join(outdir, filename.replace('MiniAODv2', 'CustomizedNanoAODv9'))
+        success = check_success(fileout)
+        print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
+        if success: continue
         logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
         queue += '%s, %s, %s, %s\n' % (nevents, filein, fileout, logprefix)
     jobfile = prepid + '.jdl'
     open(jobfile, 'w').write(jobstr % (executable, x509up, prog, queue))
-    os.system("condor_submit -file '%s'" % jobfile)
+    ((print() or print) if dryrun else os.system)("condor_submit -file '%s'" % jobfile)
 
-for prepid in sys.argv[1:]:
-    for dataset, dataset_samples in samples.items():
-        if prepid not in dataset_samples: continue
-        request(dataset, prepid, dataset_samples[prepid])
-        break
-    else:
-        print('Error: prepid not recognized: %s' % prepid)
+prepid = sys.argv[1]
+nevent = (int(sys.argv[2]) if len(sys.argv) > 2 else None) or None
+dryrun = eval(sys.argv[3]) if len(sys.argv) > 3 else False
+for dataset, dataset_samples in samples.items():
+    if prepid not in dataset_samples: continue
+    request(dataset, prepid, dataset_samples[prepid], nevent, dryrun)
+    break
+else:
+    raise RuntimeError('prepid not recognized: %s' % prepid)
