@@ -36,7 +36,7 @@ class Sample:
             if target_nevents is not None and nevents >= target_nevents: break
             file = file['file'][0]
             nevents += file['nevents']
-            filelist.append(prefix + file['name'])
+            filelist.append((file['nevents'], prefix + file['name']))
         return filelist
 
 def list_samples(directory=None):  # directory: to the 'samples' DB
