@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 from __future__ import print_function
 import os
@@ -36,13 +36,15 @@ Executable = %s
 
 +ProjectName="cms.org.cern"
 
-NTHREAD = 8
 X509UP = %s
-Arguments = $(NEVENT) $(NTHREAD) $(FILEIN) $(FILEOUT) $(X509UP)
+PROG = %s
+NTHREAD = 8
+Arguments = $(X509UP) $(PROG) $(NEVENT) $(NTHREAD) $(FILEIN) $(FILEOUT)
 
 requirements = (OpSysAndVer =?= "CentOS7")
 request_cpus = 8
 request_memory = 4096
+use_x509userproxy = True
 x509userproxy = $(X509UP)
 
 +JobFlavour = "tomorrow"
@@ -54,12 +56,12 @@ Error  = $(LOGPREFIX)_2.log
 should_transfer_files = NO
 Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
 %s)'''
-    executable = os.path.abspath(os.path.join(basedir, 'scripts', 'run.sh'))
+    executable = os.path.abspath(os.path.join(basedir, 'scripts', 'x509run'))
+    prog = os.path.abspath(os.path.join(basedir, 'scripts', 'run.sh'))
     x509up = generate_x509up()
     queue = ''
-    outdir, logdir = os.path.join(outdir, 'output', dataset, prepid), os.path.join(outdir, 'log', dataset, prepid)
-    os.makedirs(outdir, exist_ok=True)
-    os.makedirs(logdir, exist_ok=True)
+    if os.system("mkdir -p '%s' '%s'" % (outdir, logdir)):
+        raise RuntimeError('error making directories')
     for nevents, filein in sample.select(target_nevents):
         filename = os.path.basename(filein)
         fileout = os.path.join(outdir, filename)
@@ -67,7 +69,7 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
         logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
         queue += '%s, %s, %s, %s\n' % (nevents, filein, fileout, logprefix)
     jobfile = prepid + '.jdl'
-    open(jobfile, 'w').write((jobstr % (executable, x509up, queue)).replace('/eos/', '/rbf/'))
+    open(jobfile, 'w').write(jobstr % (executable, x509up, prog, queue))
     os.system("condor_submit -file '%s'" % jobfile)
 
 for prepid in sys.argv[1:]:
