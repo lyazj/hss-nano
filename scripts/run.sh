@@ -7,27 +7,18 @@ if [ -z "${HOME}" ]; then
 fi
 
 if [ $# -lt 3 ]; then
-    >&2 echo "usage: $(basename "$0") <nevent> <nthread> <file-in> <file-out> <x509up>"
+    >&2 echo "usage: $(basename "$0") <nevent> <nthread> <file-in> <file-out>"
     exit 1
 fi
 NEVENT="$1"
 NTHREAD="$2"
 FILEIN="$3"
 FILEOUT="$4"
-X509UP="$5"
-FILEIN="${FILEIN/\/rbf\//\/eos\/}"
-FILEOUT="${FILEOUT/\/rbf\//\/eos\/}"
 if [ -z "${FILEOUT}" ]; then
     FILEOUT="${FILEIN/MiniAODv2/CustomizedNanoAODv9}"
 fi
-if [ ! -z "${X509UP}" ]; then
-    export X509_USER_PROXY="${X509UP}"
-    if ! voms-proxy-info -file /tmp/x509up_u${UID}; then
-        cp "${X509_USER_PROXY}" /tmp/x509up_u${UID}
-    fi  
-fi
-if [ "${FILEIN:0:7}" != "root://" ]; then FILEIN="file:${FILEIN}" fi
-if [ "${FILEOUT:0:7}" != "root://" ]; then FILEOUT="file:${FILEOUT}" fi
+if [ "${FILEIN:0:7}" != "root://" ]; then FILEIN="file:${FILEIN}"; fi
+if [ "${FILEOUT:0:7}" != "root://" ]; then FILEOUT="file:${FILEOUT}"; fi
 
 set -ev
 voms-proxy-info  # early stop on proxy error

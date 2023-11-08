@@ -18,7 +18,7 @@ class Sample:
             filelist = json.load(open(os.path.join(directory, 'filelist')))
         except Exception:
             print('querying dataset %s' % dataset)
-            filelist = os.popen("dasgoclient -json -query='file dataset=%s'" % dataset).read()
+            filelist = self.query(dataset)
             if not filelist: raise RuntimeError('failed querying dataset %s' % dataset)
             open(os.path.join(directory, 'filelist'), 'w').write(filelist)
             filelist = json.loads(filelist)
@@ -27,6 +27,25 @@ class Sample:
     def __repr__(self):
 
         return '<%d files in %s>' % (len(self.filelist), self.dataset)
+
+    def query(self, dataset):
+        if dataset[:5] != 'file:':
+            return os.popen("dasgoclient -json -query='file dataset=%s'" % dataset).read()
+
+        # Special case: local directory.
+        directory = dataset[5:]
+        filelist = []
+        import ROOT
+        for file in os.listdir(directory):
+            if file[-5:] != '.root': continue
+            file = os.path.join(directory, file)
+            if os.stat(file).st_size < 1024 * 1024: continue
+            tfile = ROOT.TFile(file)
+            nevents = tfile.Get('Events').GetEntriesFast()
+            tfile.Close()
+            filelist.append({'file': [{'name': file, 'nevents': nevents}]})
+            print('%d root files found' % len(filelist))
+        return json.dumps(filelist)
 
     def select(self, target_nevents=None, prefix='root://xrootd-cms.infn.it/'):
 
