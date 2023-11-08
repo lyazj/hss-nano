@@ -24,6 +24,8 @@ if [ ! -z "${X509UP}" ]; then
         cp "${X509_USER_PROXY}" /tmp/x509up_u${UID}
     fi  
 fi
+if [ "${FILEIN:0:7}" != "root://" ]; then FILEIN="file:${FILEIN}" fi
+if [ "${FILEOUT:0:7}" != "root://" ]; then FILEOUT="file:${FILEOUT}" fi
 
 set -ev
 voms-proxy-info  # early stop on proxy error
@@ -51,5 +53,5 @@ cmsDriver.py \
     --step NANO \
     --era Run2_2018,run2_nanoAOD_106Xv2 \
     --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC \
-    --filein file:"${FILEIN}" \
-    --fileout file:"${FILEOUT}" \
+    --filein "${FILEIN}" \
+    --fileout "${FILEOUT}" \
