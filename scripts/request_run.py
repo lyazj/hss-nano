@@ -22,15 +22,14 @@ if len(sys.argv) < 2 or len(sys.argv) > 4:
 
 def generate_x509up(x509up=None):
     x509up = x509up or os.path.abspath(os.path.join(basedir, 'scripts', 'x509up'))
-    if os.system("voms-proxy-init -voms cms -valid 192:00 -out '%s'" % x509up):
-        raise RuntimeError('error generating x509 user proxy')
+    if os.popen("2>/dev/null voms-proxy-info --file '%s'" % x509up).read().find('timeleft  : 191') < 0:
+        if os.system("voms-proxy-init -voms cms -valid 192:00 -out '%s'" % x509up):
+            raise RuntimeError('error generating x509 user proxy')
     return x509up
 
 def check_success(fileout):
-    try:
-        return os.stat(fileout).st_size > 1024*1024
-    except Exception:
-        return False
+    os.system("touch '%s'" % fileout)
+    return os.stat(fileout).st_size > 1024*1024
 
 def request(dataset, prepid, sample, target_nevents=None, dryrun=False, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD'):
     jobstr = '''Universe = vanilla
@@ -82,8 +81,9 @@ prepid = sys.argv[1]
 nevent = (int(sys.argv[2]) if len(sys.argv) > 2 else None) or None
 dryrun = eval(sys.argv[3]) if len(sys.argv) > 3 else False
 for dataset, dataset_samples in samples.items():
-    if prepid not in dataset_samples: continue
-    request(dataset, prepid, dataset_samples[prepid], nevent, dryrun)
-    break
+    if prepid != 'all' and prepid not in dataset_samples: continue
+    for pid in (dataset_samples.keys() if prepid == 'all' else [prepid]):
+        request(dataset, pid, dataset_samples[pid], nevent, dryrun)
+    if prepid != 'all': break
 else:
-    raise RuntimeError('prepid not recognized: %s' % prepid)
+    if prepid != 'all': raise RuntimeError('prepid not recognized: %s' % prepid)
