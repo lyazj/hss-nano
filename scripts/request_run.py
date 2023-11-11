@@ -55,6 +55,7 @@ Output = $(LOGPREFIX)_1.log
 Error  = $(LOGPREFIX)_2.log
 
 should_transfer_files = NO
+transfer_output_files = ""
 Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
 %s)'''
     executable = os.path.abspath(os.path.join(basedir, 'scripts', 'x509run'))
