@@ -47,3 +47,4 @@ cmsDriver.py \
     --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC \
     --filein "${FILEIN}" \
     --fileout "${FILEOUT}" \
+    --customise_commands 'process.source.duplicateCheckMode = cms.untracked.string("noDuplicateCheck")' \
