@@ -43,7 +43,7 @@ class Sample:
             tfile = ROOT.TFile(file)
             nevents = tfile.Get('Events').GetEntriesFast()
             tfile.Close()
-            filelist.append({'file': [{'name': file, 'nevents': nevents}]})
+            filelist.append({'file': [{'name': 'file:' + file, 'nevents': nevents}]})
             print('%d root files found' % len(filelist))
         return json.dumps(filelist)
 
@@ -54,8 +54,11 @@ class Sample:
         for file in self.filelist:
             if target_nevents is not None and nevents >= target_nevents: break
             file = file['file'][0]
+            name = file['name']
+            if name[:5] != 'file:': name = prefix + name
+            else: name = name[5:]
             nevents += file['nevents']
-            filelist.append((file['nevents'], prefix + file['name']))
+            filelist.append((file['nevents'], name))
         return filelist
 
 def list_samples(directory=None):  # directory: to the 'samples' DB
