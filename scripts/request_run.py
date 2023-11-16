@@ -54,7 +54,7 @@ Log    = $(LOGPREFIX).log
 Output = $(LOGPREFIX)_1.log
 Error  = $(LOGPREFIX)_2.log
 
-should_transfer_files = NO
+should_transfer_files = YES
 transfer_input_files = ""
 transfer_output_files = ""
 Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
