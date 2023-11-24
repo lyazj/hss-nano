@@ -44,7 +44,7 @@ PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
 ### Get the ParT model
 
 ```bash
-wget https://coli.web.cern.ch/coli/tmp/.231024-123346_partv2_ak15_testonly/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak15/V02/model.onnx
+wget https://coli.web.cern.ch/coli/tmp/.231117-195737_ak15_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak15/V02/model.onnx
 ```
 
 ### Compile
