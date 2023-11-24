@@ -31,7 +31,7 @@ cmsenv
 rm -rf PhysicsTools/NanoTuples
 git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-ak15tagger-UL
 PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
-wget https://coli.web.cern.ch/coli/tmp/.231024-123346_partv2_ak15_testonly/model.onnx -O PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak15/V02/model.onnx
+wget https://coli.web.cern.ch/coli/tmp/.231117-195737_ak15_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak15/V02/model.onnx
 scram b -j$(cat /proc/cpuinfo | grep MHz | wc -l)
 
 cmsDriver.py \
