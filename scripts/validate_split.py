@@ -50,5 +50,5 @@ for origin, list_of_samples in split_samples.items():
             print(' ' * len(name), *(sids + ['diff']), sep='\t')
         #if len(group) < len(sids): continue
         diff = sum(group.get(sid, 0) for sid in sids[1:]) - group.get(sids[0], 0)
-        if diff == 0: continue
+        #if diff == 0: continue
         print(name, *([group.get(sid, '-') for sid in sids] + [diff]), sep='\t')
