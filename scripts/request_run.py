@@ -14,9 +14,9 @@ samples = sample.list_samples()
 if len(sys.argv) < 2 or len(sys.argv) > 4:
     print('Usage: %s [ <prepid> [ <nevent> [ <dryrun> ] ] ]' % os.path.basename(sys.argv[0]))
     print('Available prepids:')
-    for dataset, dataset_samples in samples.items():
+    for dataset, dataset_samples in sorted(samples.items()):
         print('-', dataset)
-        for prepid in dataset_samples.keys():
+        for prepid in sorted(dataset_samples.keys()):
             print(' ', '+', prepid)
     sys.exit(0)
 
