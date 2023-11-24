@@ -31,6 +31,10 @@ def check_success(fileout):
     os.system("touch '%s'" % fileout)
     return os.stat(fileout).st_size > 1024*1024
 
+def eos_to_xrd(path):
+    if path[:4] == '/eos': return 'root://eosuser.cern.ch/' + path
+    return path
+
 def request(dataset, prepid, sample, target_nevents=None, dryrun=False, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD'):
     jobstr = '''Universe = vanilla
 Executable = %s
@@ -74,6 +78,7 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
         print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
         if success: continue
         logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
+        filein, fileout = map(eos_to_xrd, (filein, fileout))
         queue += '%s, %s, %s, %s\n' % (nevents, filein, fileout, logprefix)
     jobfile = prepid + '.jdl'
     open(jobfile, 'w').write(jobstr % (executable, x509up, prog, queue))
