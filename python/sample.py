@@ -69,6 +69,9 @@ class Sample:
             filelist.append((file['nevents'], name))
         return filelist
 
+    def count(self):
+        return sum(file['file'][0]['nevents'] for file in self.filelist)
+
 def list_samples(directory=None):  # directory: to the 'samples' DB
 
     directory = directory or os.path.join(basedir, 'samples')

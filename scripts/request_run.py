@@ -16,8 +16,8 @@ if len(sys.argv) < 2 or len(sys.argv) > 4:
     print('Available prepids:')
     for dataset, dataset_samples in sorted(samples.items()):
         print('-', dataset)
-        for prepid in sorted(dataset_samples.keys()):
-            print(' ', '+', prepid)
+        for prepid, sample in sorted(dataset_samples.items()):
+            print(' ', '+', prepid, '(%d events%s)' % (sample.count(), ', %d maximum' % sample.maxevent if sample.maxevent else ''))
     sys.exit(0)
 
 def generate_x509up(x509up=None):
