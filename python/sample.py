@@ -24,11 +24,18 @@ class Sample:
             filelist = json.loads(filelist)
         self.filelist = filelist
 
+        # Load optional event number upper limit.
+        try:
+            self.maxevent = int(open(os.path.join(directory, 'maxevent')).read())
+        except Exception:
+            self.maxevent = None
+
     def __repr__(self):
 
         return '<%d files in %s>' % (len(self.filelist), self.dataset)
 
     def query(self, dataset):
+
         if dataset[:5] != 'file:':
             return os.popen("dasgoclient -json -query='file dataset=%s'" % dataset).read()
 
@@ -49,6 +56,7 @@ class Sample:
 
     def select(self, target_nevents=None, prefix='root://xrootd-cms.infn.it/'):
 
+        if target_nevents is None: target_nevents = self.maxevent
         filelist = []
         nevents = 0
         for file in self.filelist:
