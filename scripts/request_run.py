@@ -13,9 +13,9 @@ samples = sample.list_samples()
 
 if len(sys.argv) < 2 or len(sys.argv) > 4:
     print('Usage: %s [ <prepid> [ <nevent> [ <dryrun> ] ] ]' % os.path.basename(sys.argv[0]))
-    print('Available prepids:')
+    print('\nAvailable prepids:')
     for dataset, dataset_samples in sorted(samples.items()):
-        print('-', dataset)
+        print('\n-', dataset)
         for prepid, sample in sorted(dataset_samples.items()):
             print(' ', '+', prepid, '(%d events%s)' % (sample.count(), ', %d maximum' % sample.maxevent if sample.maxevent is not None else ''))
     sys.exit(0)
