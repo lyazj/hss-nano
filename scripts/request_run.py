@@ -17,7 +17,7 @@ if len(sys.argv) < 2 or len(sys.argv) > 4:
     for dataset, dataset_samples in sorted(samples.items()):
         print('-', dataset)
         for prepid, sample in sorted(dataset_samples.items()):
-            print(' ', '+', prepid, '(%d events%s)' % (sample.count(), ', %d maximum' % sample.maxevent if sample.maxevent else ''))
+            print(' ', '+', prepid, '(%d events%s)' % (sample.count(), ', %d maximum' % sample.maxevent if sample.maxevent is not None else ''))
     sys.exit(0)
 
 def generate_x509up(x509up=None):
