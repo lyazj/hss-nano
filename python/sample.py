@@ -26,7 +26,7 @@ class Sample:
 
         # Load optional event number upper limit.
         try:
-            self.maxevent = int(open(os.path.join(directory, 'maxevent')).read())
+            self.maxevent = self.adjust_maxevent(int(open(os.path.join(directory, 'maxevent')).read()))
         except Exception:
             self.maxevent = None
 
@@ -71,6 +71,10 @@ class Sample:
 
     def count(self):
         return sum(file['file'][0]['nevents'] for file in self.filelist)
+
+    def adjust_maxevent(self, maxevent):
+        filelist = self.select(maxevent)
+        return sum(file[0] for file in filelist)
 
 def list_samples(directory=None):  # directory: to the 'samples' DB
 
