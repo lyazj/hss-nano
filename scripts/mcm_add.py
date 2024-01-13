@@ -15,7 +15,7 @@ metadata = requests.get('https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/re
 mcm_dataset = metadata['dataset_name']
 das_dataset = metadata['output_dataset']
 if len(das_dataset) != 1:
-    raise RuntimeError('unexpected DAS dataset length: %d' % das_dataset)
+    raise RuntimeError('unexpected DAS dataset length: %d' % len(das_dataset))
 das_dataset = das_dataset[0]
 print('-', mcm_dataset)
 print('  -', prepid)
