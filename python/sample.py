@@ -1,5 +1,7 @@
+from __future__ import print_function
 import os
 import json
+import requests
 
 basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -8,6 +10,8 @@ class Sample:
     def __init__(self, directory):  # directory: to the sample DB
 
         self.directory = directory
+        self.mcm_prepid = os.path.basename(self.directory)
+        self.mcm_dataset = os.path.basename(os.path.dirname(self.directory))
 
         # Load DAS dataset name.
         dataset = open(os.path.join(directory, 'dataset')).read().strip()
@@ -29,6 +33,28 @@ class Sample:
             self.maxevent = self.adjust_maxevent(int(open(os.path.join(directory, 'maxevent')).read()))
         except Exception:
             self.maxevent = None
+
+        # Load XSDB information.
+        try:
+            xsdb = json.load(open(os.path.join(directory, 'xsdb')))
+        except Exception:
+            print('querying xsdb %s' % dataset)
+            xsdb = requests.post('https://xsdb-temp.app.cern.ch/api/search', json={
+                'orderBy': [],
+                'pagination': { 'currentPage': 0, 'pageSize': 0 },
+                'search': { 'DAS': self.mcm_dataset },
+            }).text
+            open(os.path.join(directory, 'xsdb'), 'w').write(xsdb)
+            xsdb = json.loads(xsdb)
+        self.xsdb = xsdb
+
+        # Load cross section.
+        try:
+            xs = json.load(open(os.path.join(directory, 'xs')))
+        except Exception:
+            xs = self.generate_xs()
+            open(os.path.join(directory, 'xs'), 'w').write(json.dumps(xs))
+        self.xs = xs
 
     def __repr__(self):
 
@@ -75,6 +101,19 @@ class Sample:
     def adjust_maxevent(self, maxevent):
         filelist = self.select(maxevent)
         return sum(file[0] for file in filelist)
+
+    def generate_xs(self):
+        xsdb = self.xsdb
+        if len(xsdb) == 0: return
+        if len(xsdb) == 1: return xsdb[0]
+        for i, item in enumerate(xsdb):
+            print('[%d]' % i, item['status'], item['MCM'], item['energy'],
+                  item['cross_section'], item['total_uncertainty'], sep='\t')
+        while True:
+            try:
+                return xsdb[int(input('Choice for %s: ' % self.mcm_prepid))]
+            except Exception:
+                pass
 
 def list_samples(directory=None):  # directory: to the 'samples' DB
 
