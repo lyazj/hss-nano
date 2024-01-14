@@ -98,6 +98,14 @@ if prepid == 'describe':
             print('%s  xs:' % prefix, sample.xs['cross_section'] if sample.xs else 'null')
             print()
     sys.exit(0)
+if prepid == 'list':
+    for dataset, dataset_samples in sorted(samples.items()):
+        print('%s:' % dataset)
+        for prepid, sample in sorted(dataset_samples.items()):
+            print('  - %s:' % prepid)
+            for nevents, filein in sample.select(min(nevent if nevent else (2**128 - 1), sample.maxevent)):
+                print('      - %s' % filein)
+    sys.exit(0)
 for dataset, dataset_samples in samples.items():
     if prepid != 'all' and prepid not in dataset_samples: continue
     for pid in (dataset_samples.keys() if prepid == 'all' else [prepid]):
