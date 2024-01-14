@@ -87,6 +87,17 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
 prepid = sys.argv[1]
 nevent = (int(sys.argv[2]) if len(sys.argv) > 2 else None) or None
 dryrun = eval(sys.argv[3]) if len(sys.argv) > 3 else False
+if prepid == 'describe':
+    prefix = ' ' * 6
+    for dataset, dataset_samples in sorted(samples.items()):
+        for prepid, sample in sorted(dataset_samples.items()):
+            print('%s- name:' % prefix, sample.mcm_prepid)
+            print('%s  dataset:' % prefix, sample.mcm_dataset)
+            print('%s  nevent:' % prefix, min(sample.maxevent or (2**128 - 1), sample.count()))
+            print('%s  xs-name:' % prefix, sample.xs['MCM'] if sample.xs else 'null')
+            print('%s  xs:' % prefix, sample.xs['cross_section'] if sample.xs else 'null')
+            print()
+    sys.exit(0)
 for dataset, dataset_samples in samples.items():
     if prepid != 'all' and prepid not in dataset_samples: continue
     for pid in (dataset_samples.keys() if prepid == 'all' else [prepid]):
