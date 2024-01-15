@@ -35,7 +35,7 @@ for origin, list_of_samples in split_samples.items():
     samples_grouped_by_name = { }
     for sid, samples in list_of_samples:
         sids.add(sid)
-        for nevent, filename in samples.select():
+        for nevent, filename in samples.select(2**128 - 1):
             basename = os.path.basename(filename)
             group = samples_grouped_by_name.get(basename, { })
             group[sid] = nevent
@@ -47,6 +47,9 @@ for origin, list_of_samples in split_samples.items():
             first = False
             print(' ' * len(name), *(sids + ['diff']), sep='\t')
         #if len(group) < len(sids): continue
-        diff = sum(group.get(sid, 0) for sid in sids[1:]) - group.get(sids[0], 0)
+        got = sum(group.get(sid, 0) for sid in sids[1:])
+        if got == 0: continue
+        expected = group.get(sids[0], 0)
+        diff = got - expected
         #if diff == 0: continue
         print(name, *([group.get(sid, '-') for sid in sids] + [diff]), sep='\t')
