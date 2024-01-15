@@ -8,6 +8,8 @@ basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(basedir, 'python'))
 
 import sample
+import ROOT
+import traceback
 
 samples = sample.list_samples()
 
@@ -27,9 +29,14 @@ def generate_x509up(x509up=None):
             raise RuntimeError('error generating x509 user proxy')
     return x509up
 
-def check_success(fileout):
+def check_success(fileout, nevents):
     os.system("touch '%s'" % fileout)
-    return os.stat(fileout).st_size > 1024*1024
+    try:
+        tfile = ROOT.TFile(fileout)
+        return tfile.Get('Events').GetEntries() == nevents
+    except Exception:
+        traceback.print_exc()
+        return False
 
 def eos_to_xrd(path):
     if path[:4] == '/eos': return 'root://eosuser.cern.ch/' + path
@@ -74,7 +81,7 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
     for nevents, filein in sample.select(target_nevents):
         filename = os.path.basename(filein)
         fileout = os.path.join(outdir, filename.replace('MiniAODv2', 'CustomizedNanoAODv9'))
-        success = check_success(fileout)
+        success = check_success(fileout, nevents)
         print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
         if success: continue
         logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
