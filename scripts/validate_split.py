@@ -35,12 +35,10 @@ for origin, list_of_samples in split_samples.items():
     samples_grouped_by_name = { }
     for sid, samples in list_of_samples:
         sids.add(sid)
-        for sample in samples.filelist:
-            sample = sample['file'][0]
-            nevents = sample['nevents']
-            basename = os.path.basename(sample['name'])
+        for nevent, filename in samples.select():
+            basename = os.path.basename(filename)
             group = samples_grouped_by_name.get(basename, { })
-            group[sid] = nevents
+            group[sid] = nevent
             samples_grouped_by_name[basename] = group
     sids = sorted(sids)
     first = True
