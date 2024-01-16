@@ -32,8 +32,9 @@ def generate_x509up(x509up=None):
 def check_success(fileout, nevents):
     os.system("touch '%s'" % fileout)
     try:
+        #return os.stat(fileout).st_size >= 12*4096  # fast check
         tfile = ROOT.TFile(fileout)
-        return tfile.Get('Events').GetEntries() == nevents
+        return tfile.Get('Events').GetEntries() == nevents  # reliable check
     except Exception:
         traceback.print_exc()
         return False
@@ -53,13 +54,17 @@ PROG = %s
 NTHREAD = 8
 Arguments = $(X509UP) $(PROG) $(NEVENT) $(NTHREAD) $(FILEIN) $(FILEOUT)
 
-requirements = (OpSysAndVer =?= "CentOS7")
 request_cpus = 8
 request_memory = 4096
 use_x509userproxy = True
 x509userproxy = $(X509UP)
 
-+JobFlavour = "tomorrow"
+on_exit_remove        = (ExitBySignal == False) && (ExitCode == 0)
+on_exit_hold          = (ExitBySignal == True) || (ExitCode != 0)
+on_exit_hold_reason   = strcat("Job held by ON_EXIT_HOLD due to ", ifThenElse((ExitBySignal == True), strcat("exit signal ", ExitSignal), strcat("exit code ", ExitCode)), ".")
+periodic_release      = (NumJobStarts < 3) && ((CurrentTime - EnteredCurrentStatus) > 2*60)
+
++MaxRuntime = 4*60*60
 
 Log    = $(LOGPREFIX).log
 Output = $(LOGPREFIX)_1.log
