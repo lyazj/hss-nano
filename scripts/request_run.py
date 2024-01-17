@@ -62,7 +62,7 @@ x509userproxy = $(X509UP)
 on_exit_remove        = (ExitBySignal == False) && (ExitCode == 0)
 on_exit_hold          = (ExitBySignal == True) || (ExitCode != 0)
 on_exit_hold_reason   = strcat("Job held by ON_EXIT_HOLD due to ", ifThenElse((ExitBySignal == True), strcat("exit signal ", ExitSignal), strcat("exit code ", ExitCode)), ".")
-periodic_release      = (NumJobStarts < 3) && ((CurrentTime - EnteredCurrentStatus) > 2*60)
+periodic_release      = (NumJobStarts < 3) && ((CurrentTime - EnteredCurrentStatus) > 60*60)
 
 +MaxRuntime = 4*60*60
 

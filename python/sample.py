@@ -80,7 +80,7 @@ class Sample:
             print('%d root files found' % len(filelist))
         return json.dumps(filelist)
 
-    def select(self, target_nevents=None, prefix='root://xrootd-cms.infn.it/'):
+    def select(self, target_nevents=None, prefix='root://cms-xrd-global.cern.ch/'):
 
         if target_nevents is None: target_nevents = self.maxevent
         filelist = []
