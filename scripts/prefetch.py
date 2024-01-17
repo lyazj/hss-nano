@@ -14,9 +14,15 @@ import sample
 
 samples = sample.list_samples()
 
-sys.argv.append('root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18MiniAODv2/Z1JetsToNuNu_M-50_LHEFilterPtZ-400ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/40000/B8CB7A75-9E0F-114E-9E33-A25142BB071F.root')  # DEBUG
 if len(sys.argv) < 2 or len(sys.argv) > 4:
     print('Usage: %s <url>' % os.path.basename(sys.argv[0]))
+    print('\nPrefetched files:')
+    for dataset_samples in samples.values():
+        for sample in dataset_samples.values():
+            if not sample.prefetch: continue
+            print('\n  - %s/%s:\n' % (sample.mcm_dataset, sample.mcm_prepid))
+            for name in sample.prefetch:
+                print('      - %s' % name)
     sys.exit(0)
 url = sys.argv[1]
 

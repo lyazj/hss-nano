@@ -14,12 +14,12 @@ class Sample:
         self.mcm_dataset = os.path.basename(os.path.dirname(self.directory))
 
         # Load prefetch information.
-        prefetched = { }
+        prefetch = { }
         for file in os.listdir(self.directory):
             if file[:9] == 'prefetch-':
                 dest = open(os.path.join(self.directory, file)).read().strip()
-                prefetched[file[9:]] = dest
-        self.prefetched = prefetched
+                prefetch[file[9:]] = dest
+        self.prefetch = prefetch
 
         # Load DAS dataset name.
         dataset = open(os.path.join(directory, 'dataset')).read().strip()
@@ -37,11 +37,11 @@ class Sample:
         for file in filelist:
             file = file['file'][0]
             basename = os.path.basename(file['name'])
-            if basename not in self.prefetched: continue
-            prefetched = self.prefetched[basename]
-            if file['name'] != prefetched[-len(file['name']):]:
-                raise RuntimeError('mismatched prefetching: %s <-> %s' % (file['name'], prefetched))
-            file['name'] = prefetched
+            if basename not in self.prefetch: continue
+            prefetch = self.prefetch[basename]
+            if file['name'] != prefetch[-len(file['name']):]:
+                raise RuntimeError('mismatched prefetching: %s <-> %s' % (file['name'], prefetch))
+            file['name'] = prefetch
         self.filelist = filelist
 
         # Load optional event number upper limit.
@@ -130,15 +130,6 @@ class Sample:
                 return xsdb[int(input('Choice for %s: ' % self.mcm_prepid))]
             except Exception:
                 pass
-
-    def prefetch(self, url):
-        for file in self.filelist:
-            file = file['file'][0]
-            name = file['name']
-            if name[:5] == 'file:': continue
-            name = prefix + name
-            if name != url: continue
-            print(name)
 
 def list_samples(directory=None):  # directory: to the 'samples' DB
 
