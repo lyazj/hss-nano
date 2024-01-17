@@ -8,7 +8,7 @@ import re
 basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(basedir, 'python'))
 
-PREFETCH_PREFIX = 'file:/eos/user/l/legao/hss/prefetch'
+PREFETCH_PREFIX = '/eos/user/l/legao/hss/prefetch'
 
 import sample
 
@@ -32,4 +32,4 @@ for sample in samples[dataset].values():
         file = file['file'][0]
         if file['name'] == name:
             if os.system("xrdcp '%s' '%s'" % (url, PREFETCH_PREFIX + name)) == 0:
-                open(os.path.join(sample.directory, 'prefetch-%s' % os.path.basename(name)), 'w').write(PREFETCH_PREFIX + name)
+                open(os.path.join(sample.directory, 'prefetch-%s' % os.path.basename(name)), 'w').write('file:' + PREFETCH_PREFIX + name)
