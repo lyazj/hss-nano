@@ -8,7 +8,6 @@ basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(basedir, 'python'))
 
 import sample
-import ROOT
 import traceback
 
 samples = sample.list_samples()
@@ -33,6 +32,7 @@ def check_success(fileout, nevents):
     os.system("touch '%s'" % fileout)
     try:
         #return os.stat(fileout).st_size >= 12*4096  # fast check
+        import ROOT
         tfile = ROOT.TFile(fileout)
         return tfile.Get('Events').GetEntries() == nevents  # reliable check
     except Exception:
