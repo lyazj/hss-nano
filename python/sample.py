@@ -13,6 +13,14 @@ class Sample:
         self.mcm_prepid = os.path.basename(self.directory)
         self.mcm_dataset = os.path.basename(os.path.dirname(self.directory))
 
+        # Load prefetch information.
+        prefetched = { }
+        for file in os.listdir(self.directory):
+            if file[:9] == 'prefetch-':
+                dest = open(os.path.join(self.directory, file)).read().strip()
+                prefetched[file[9:]] = dest
+        self.prefetched = prefetched
+
         # Load DAS dataset name.
         dataset = open(os.path.join(directory, 'dataset')).read().strip()
         self.dataset = dataset
@@ -26,6 +34,14 @@ class Sample:
             if not filelist: raise RuntimeError('failed querying dataset %s' % dataset)
             open(os.path.join(directory, 'filelist'), 'w').write(filelist)
             filelist = json.loads(filelist)
+        for file in filelist:
+            file = file['file'][0]
+            basename = os.path.basename(file['name'])
+            if basename not in self.prefetched: continue
+            prefetched = self.prefetched[basename]
+            if file['name'] != prefetched[-len(file['name']):]:
+                raise RuntimeError('mismatched prefetching: %s <-> %s' % (file['name'], prefetched))
+            file['name'] = prefetched
         self.filelist = filelist
 
         # Load optional event number upper limit.
