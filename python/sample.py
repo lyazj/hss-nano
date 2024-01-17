@@ -115,6 +115,15 @@ class Sample:
             except Exception:
                 pass
 
+    def prefetch(self, url):
+        for file in self.filelist:
+            file = file['file'][0]
+            name = file['name']
+            if name[:5] == 'file:': continue
+            name = prefix + name
+            if name != url: continue
+            print(name)
+
 def list_samples(directory=None):  # directory: to the 'samples' DB
 
     directory = directory or os.path.join(basedir, 'samples')
