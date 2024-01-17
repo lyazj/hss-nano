@@ -21,6 +21,11 @@ class Sample:
                 prefetch[file[9:]] = dest
         self.prefetch = prefetch
 
+        # Load ignore information.
+        try: ignore = set(open(os.path.join(self.directory, 'ignore')).read().strip().split())
+        except Exception: ignore = set()
+        self.ignore = ignore
+
         # Load DAS dataset name.
         dataset = open(os.path.join(directory, 'dataset')).read().strip()
         self.dataset = dataset
@@ -34,6 +39,7 @@ class Sample:
             if not filelist: raise RuntimeError('failed querying dataset %s' % dataset)
             open(os.path.join(directory, 'filelist'), 'w').write(filelist)
             filelist = json.loads(filelist)
+        filelist = [file for file in filelist if file['file'][0]['name'] not in self.ignore]
         for file in filelist:
             file = file['file'][0]
             basename = os.path.basename(file['name'])
