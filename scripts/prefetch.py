@@ -8,7 +8,7 @@ import re
 basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(basedir, 'python'))
 
-PREFETCH_PREFIX = 'root://eosuser.cern.ch//eos/user/l/legao/hss/prefetch'
+PREFETCH_PREFIX = 'file:/eos/user/l/legao/hss/prefetch'
 
 import sample
 
