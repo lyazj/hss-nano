@@ -76,7 +76,7 @@ def getCustomTaggerDiscriminatorsAK8(process, name):
         },
         'InclParticleTransformerV2': {
             'cff_path': 'PhysicsTools.NanoTuples.hwwTagger.pfMassDecorrelatedInclParticleTransformerV2_cff',
-            'disc_name': '_pfMassDecorrelatedInclParticleTransformerV2JetTagsAll',
+            'disc_name': '_pfMassDecorrelatedInclParticleTransformerV2JetTagsAllSelected',
             'nano_branch_name': 'inclParTMDV2',
         },
     }

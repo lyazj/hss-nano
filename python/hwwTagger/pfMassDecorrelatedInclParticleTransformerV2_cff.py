@@ -39,12 +39,17 @@ pfMassDecorrelatedInclParticleTransformerV2JetTags = boostedJetONNXJetTagsProduc
 # probs
 _pfMassDecorrelatedInclParticleTransformerV2JetTagsProbs = ['pfMassDecorrelatedInclParticleTransformerV2JetTags:' + flav_name
                                  for flav_name in pfMassDecorrelatedInclParticleTransformerV2JetTags.flav_names]
+
+_pfMassDecorrelatedInclParticleTransformerV2JetTagsProbsSelected = ['pfMassDecorrelatedInclParticleTransformerV2JetTags:' + flav_name
+                                 for flav_name in ['probHbb', 'probHcc', 'probHss', 'probHqq', 'probHbc', 'probHbs', 'probHcs', 'probHgg', 'probHee', 'probHmm', 'probHtauhtaue', 'probHtauhtaum', 'probHtauhtauh', 
+                                                   'probQCDbb', 'probQCDcc', 'probQCDb', 'probQCDc', 'probQCDothers', 
+                                                   'resonanceMassCorr', 'visiableMassCorr']]
 # meta-taggers
 _pfMassDecorrelatedInclParticleTransformerV2JetTagsMetaDiscrs = ['pfMassDecorrelatedInclParticleTransformerV2DiscriminatorsJetTags:' + disc.name.value()
                                       for disc in pfMassDecorrelatedInclParticleTransformerV2DiscriminatorsJetTags.discriminators]
 
 _pfMassDecorrelatedInclParticleTransformerV2JetTagsAll = _pfMassDecorrelatedInclParticleTransformerV2JetTagsProbs + _pfMassDecorrelatedInclParticleTransformerV2JetTagsMetaDiscrs
-
+_pfMassDecorrelatedInclParticleTransformerV2JetTagsAllSelected = _pfMassDecorrelatedInclParticleTransformerV2JetTagsProbsSelected + _pfMassDecorrelatedInclParticleTransformerV2JetTagsMetaDiscrs
 
 # ===========================================================================================
 # For AK15 jets:
