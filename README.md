@@ -41,7 +41,7 @@ cmsenv
 ### Get customized NanoAOD producers
 
 ```bash
-git clone https://github.com/colizz/NanoTuples.git PhysicsTools/NanoTuples -b dev-ak15tagger-UL
+git clone https://github.com/colizz/NanoTuples.git PhysicsTools/NanoTuples -b dev-part-UL
 ```
 
 ### Use an updated onnxruntime package (before compiling the code)
