@@ -43,7 +43,7 @@ def eos_to_xrd(path):
     if path[:4] == '/eos': return 'root://eosuser.cern.ch/' + path
     return path
 
-def request(dataset, prepid, sample, target_nevents=None, dryrun=False, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD'):
+def request(dataset, prepid, sample, target_nevents=None, dryrun=False, outdir='/eos/user/l/legao/hss/samples/CustomizedNanoAOD8'):
     jobstr = '''Universe = vanilla
 Executable = %s
 
