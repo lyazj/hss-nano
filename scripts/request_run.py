@@ -112,7 +112,8 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
         print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
         if success: continue
         #os.close(os.open(fileout, os.O_WRONLY | os.O_TRUNC))  # truncate
-        logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
+        #logprefix = os.path.join(logdir, os.path.splitext(filename)[0])
+        logprefix = os.path.join(logdir, 'condor')
         filein, fileout = map(eos_to_xrd, (filein, fileout))
         queue += '%s, %s, %s, %s\n' % (nevents, filein, fileout, logprefix)
     jobfile = prepid + '.jdl'
