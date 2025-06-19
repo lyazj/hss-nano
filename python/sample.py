@@ -6,6 +6,14 @@ import multiprocessing
 
 basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def get_cookie():
+    # We should use a temporary file to input Cookie as it is longer than 4096, the Linux tty's upper limit.
+    with open('cookie.txt', 'w') as cookie: print('Please launch your browser and access the page:\n\n    https://xsecdb-xsdb-official.app.cern.ch/xsdb/?searchQuery=DAS%3DTTToSemiLeptonic_Vcb_TuneCP5_13TeV-powheg-pythia8\n\nThen copy the Cookie VALUE of the POST request to https://xsecdb-xsdb-official.app.cern.ch/api/search found in the developer tools and paste it to replace the whole content of this file.\n\nLeave this file black to disable the automatic XSDB query.', file=cookie, flush=True)
+    os.system('vim cookie.txt')
+    with open('cookie.txt') as cookie: cookie = cookie.read().strip()
+    os.remove('cookie.txt')
+    globals()['cookie'] = cookie
+
 class Sample:
 
     def __init__(self, directory):  # directory: to the sample DB
@@ -62,11 +70,15 @@ class Sample:
             xsdb = json.load(open(os.path.join(directory, 'xsdb')))
         except Exception:
             print('querying xsdb %s' % dataset)
-            xsdb = requests.post('https://xsecdb-xsdb-official.app.cern.ch/api/search', json={
-                'orderBy': [],
-                'pagination': { 'currentPage': 0, 'pageSize': 0 },
-                'search': { 'DAS': self.mcm_dataset },
-            }).text
+            if 'cookie' not in globals(): get_cookie()
+            if cookie:
+                xsdb = requests.post('https://xsecdb-xsdb-official.app.cern.ch/api/search', json={
+                    'orderBy': {},
+                    'pagination': { 'currentPage': 0, 'pageSize': 0 },
+                    'search': { 'DAS': self.mcm_dataset },
+                }, headers={'Cookie': cookie}).text
+            else:
+                xsdb = '[]'
             open(os.path.join(directory, 'xsdb'), 'w').write(xsdb)
             xsdb = json.loads(xsdb)
         self.xsdb = xsdb
