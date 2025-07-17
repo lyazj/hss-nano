@@ -12,6 +12,26 @@ def nanoTuples_customizeVectexTable(process):
     return process
 
 
+def nanoTuples_customizeJetTable(process):
+    PARTICLENETAK4VARS = cms.PSet(
+        ParticleNetAK4_probb = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probbb'):-1",float,doc="ParticleNetAK4 tagger b probability",precision=10),
+        ParticleNetAK4_probbb = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probb'):-1",float,doc="ParticleNetAK4 tagger bb probability",precision=10),
+        ParticleNetAK4_probc = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probc'):-1",float,doc="ParticleNetAK4 tagger c probability",precision=10),
+        ParticleNetAK4_probcc = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probcc'):-1",float,doc="ParticleNetAK4 tagger cc probability",precision=10),
+        ParticleNetAK4_probuds = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probuds'):-1",float,doc="ParticleNetAK4 tagger uds probability",precision=10),
+        ParticleNetAK4_probg = Var("?pt>15?bDiscriminator('pfParticleNetAK4JetTags:probg'):-1",float,doc="ParticleNetAK4 tagger g probability",precision=10),
+        particleNetAK4_probpu = Var("?pt>15?1-bDiscriminator('pfParticleNetAK4JetTags:probpu'):-1",float,doc="ParticleNetAK4 tagger pileup jet probability",precision=10),
+    )
+    process.jetTable.variables.ParticleNetAK4_probb   = PARTICLENETAK4VARS.ParticleNetAK4_probb
+    process.jetTable.variables.ParticleNetAK4_probbb  = PARTICLENETAK4VARS.ParticleNetAK4_probbb
+    process.jetTable.variables.ParticleNetAK4_probc   = PARTICLENETAK4VARS.ParticleNetAK4_probc
+    process.jetTable.variables.ParticleNetAK4_probcc  = PARTICLENETAK4VARS.ParticleNetAK4_probcc
+    process.jetTable.variables.ParticleNetAK4_probuds = PARTICLENETAK4VARS.ParticleNetAK4_probuds
+    process.jetTable.variables.ParticleNetAK4_probg   = PARTICLENETAK4VARS.ParticleNetAK4_probg
+    process.jetTable.variables.particleNetAK4_probpu  = PARTICLENETAK4VARS.particleNetAK4_probpu
+    return process
+
+
 def nanoTuples_customizeFatJetTable(process, runOnMC, addDeepAK8Probs=False):
     if addDeepAK8Probs:
         # add DeepAK8 raw scores: nominal
@@ -52,6 +72,8 @@ def nanoTuples_customizeCommon(process, runOnMC, addAK15=True, addAK8=False, add
         pfcand_params['jetTables'].append('fatJetTable')
     if addPFcands:
         addPFCands(process, outTableName='PFCands', **pfcand_params)
+
+    nanoTuples_customizeJetTable(process)
 
     # nanoTuples_customizeVectexTable(process)
     # nanoTuples_customizeFatJetTable(process, runOnMC=runOnMC)

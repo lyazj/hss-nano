@@ -32,7 +32,7 @@ cmsenv
 ### Get customized NanoAOD producers
 
 ```bash
-git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-part-UL
+git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-part-UL-ttH
 ```
 
 ### Use an updated onnxruntime package (before compiling the code)
