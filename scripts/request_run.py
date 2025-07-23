@@ -30,14 +30,19 @@ def generate_x509up(x509up=None):
 
 def check_success(fileout, nevents):
     os.system("touch '%s'" % fileout)
+    import ROOT
+    errorIgnoreLevel = ROOT.gErrorIgnoreLevel
+    ROOT.gErrorIgnoreLevel = ROOT.kFatal
+    success = False
     try:
         #return os.stat(fileout).st_size >= 12*4096  # fast check
-        import ROOT
         tfile = ROOT.TFile(fileout)
-        return tfile.Get('Events').GetEntries() == nevents  # reliable check
+        success = tfile.Get('Events').GetEntries() == nevents  # reliable check
     except Exception:
-        traceback.print_exc()
-        return False
+        #traceback.print_exc()
+        pass
+    ROOT.gErrorIgnoreLevel = errorIgnoreLevel
+    return success
 
 def eos_to_xrd(path):
     if path[:4] == '/eos': return 'root://eosuser.cern.ch/' + path
