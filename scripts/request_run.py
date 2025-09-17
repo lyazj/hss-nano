@@ -56,10 +56,10 @@ Executable = %s
 
 X509UP = %s
 PROG = %s
-NTHREAD = 8
+NTHREAD = 1
 Arguments = $(X509UP) $(PROG) $(NEVENT) $(NTHREAD) $(FILEIN) $(FILEOUT)
 
-request_cpus = 8
+request_cpus = 1
 request_memory = 4096
 use_x509userproxy = True
 x509userproxy = $(X509UP)
@@ -101,7 +101,7 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
             raise RuntimeError('year not recognized in prepid: %s' % prepid)
     if not outdir:
         user = __import__('getpass').getuser()
-        outdir = f'/eos/user/{user[0]}/{user}/CustomizedNanoAOD/V0/{year}/{"Data" if isdata else "MC"}'
+        outdir = f'/eos/user/{user[0]}/{user}/NanoAODStore/V0/{year}/{"Data" if isdata else "MC"}'
     executable = os.path.abspath(os.path.join(basedir, 'scripts', 'x509run'))
     x509up = generate_x509up()
     prog = os.path.abspath(os.path.join(basedir, 'scripts', f'run-{"data" if isdata else "mc"}-{year}.sh'))
@@ -112,7 +112,7 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
     queue = ''
     for nevents, filein in sample.select(target_nevents):
         filename = os.path.basename(filein)
-        fileout = os.path.join(outdir, filename.replace('MiniAODv2', 'CustomizedNanoAODv9'))
+        fileout = os.path.join(outdir, filename.replace('MiniAODv2', 'CustomizedNanoAODv12'))
         success = check_success(fileout, nevents)
         print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
         if success: continue

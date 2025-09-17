@@ -23,28 +23,11 @@ if [ "${FILEOUT:0:7}" != "root://" ]; then FILEOUT="file:${FILEOUT}"; fi
 set -ev
 voms-proxy-info  # early stop on proxy error
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc7_amd64_gcc700
-[ -r CMSSW_10_6_31 ] || cmsrel CMSSW_10_6_31
-cd CMSSW_10_6_31/src
+[ -r CMSSW_13_2_2 ] || cmsrel CMSSW_13_2_2
+cd CMSSW_13_2_2/src
 cmsenv
 
-rm -rf PhysicsTools/NanoTuples
-git clone https://github.com/lyazj/hss-nano PhysicsTools/NanoTuples -b dev-part-UL
-PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
-wget https://coli.web.cern.ch/coli/tmp/.240120-181907_ak8_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak8/V02/model.onnx
 scram b -j$(cat /proc/cpuinfo | grep MHz | wc -l)
 
-cmsDriver.py \
-    --mc \
-    -n "${NEVENT}" \
-    --nThreads "${NTHREAD}" \
-    --python_filename run-mc-2018.py \
-    --eventcontent NANOAODSIM \
-    --datatier NANOAODSIM \
-    --conditions 106X_upgrade2018_realistic_v16_L1v1 \
-    --step NANO \
-    --era Run2_2018,run2_nanoAOD_106Xv2 \
-    --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC \
-    --filein "${FILEIN}" \
-    --fileout "${FILEOUT}" \
-    --customise_commands 'process.source.duplicateCheckMode = cms.untracked.string("noDuplicateCheck")' \
+cmsDriver.py  --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 106X_upgrade2018_realistic_v16_L1v1 --step NANO --era Run2_2018,run2_nanoAOD_106Xv2 --python_filename HIG-RunIISummer20UL18NanoAODv12-00162_1_cfg.py --fileout file:HIG-RunIISummer20UL18NanoAODv12-00162.root --filein "${FILEIN}" --mc -n "${NEVENT}" --nThreads "${NTHREAD}" --customise_commands 'process.genWeightsTable.keepAllPSWeights = True' || exit $?
+xrdcp -f HIG-RunIISummer20UL18NanoAODv12-00162.root "${FILEOUT}" || exit $?

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-exec voms-proxy-init -voms cms -valid 192:00 -out x509up
