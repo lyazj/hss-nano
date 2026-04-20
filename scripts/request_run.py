@@ -56,10 +56,10 @@ Executable = %s
 
 X509UP = %s
 PROG = %s
-NTHREAD = 8
+NTHREAD = 1
 Arguments = $(X509UP) $(PROG) $(NEVENT) $(NTHREAD) $(FILEIN) $(FILEOUT)
 
-request_cpus = 8
+request_cpus = 1
 request_memory = 4096
 use_x509userproxy = True
 x509userproxy = $(X509UP)
@@ -80,6 +80,7 @@ transfer_input_files = ""
 transfer_output_files = ""
 Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
 %s)'''
+    print(dataset)
     isdata = dataset in '/MET/ /SingleMuon/ /SingleElectron/ /EGamma/'  # [XXX]
     if isdata:
         if '2016' in prepid:
@@ -101,19 +102,25 @@ Queue NEVENT, FILEIN, FILEOUT, LOGPREFIX from (
             raise RuntimeError('year not recognized in prepid: %s' % prepid)
     if not outdir:
         user = __import__('getpass').getuser()
-        outdir = f'/eos/user/{user[0]}/{user}/CustomizedNanoAOD/V0/{year}/{"Data" if isdata else "MC"}'
+        #outdir = f'/eos/user/{user[0]}/{user}/CustomizedNanoAOD/V0/{year}/{"Data" if isdata else "MC"}'
+        outdir = f'root://cceos.ihep.ac.cn:1094//store/user/{user}/CustomizedNanoAOD/V0/{year}/{"Data" if isdata else "MC"}' 
+        outdirsim = f'/store/user/{user}/CustomizedNanoAOD/V0/{year}/{"Data" if isdata else "MC"}'
     executable = os.path.abspath(os.path.join(basedir, 'scripts', 'x509run'))
     x509up = generate_x509up()
     prog = os.path.abspath(os.path.join(basedir, 'scripts', f'run-{"data" if isdata else "mc"}-{year}.sh'))
     outdir = os.path.join(outdir, dataset, prepid)
+    outdirsim = os.path.join(outdirsim, dataset, prepid)
     logdir = os.path.join(basedir, 'scripts', 'log', dataset, prepid)
-    if os.system("mkdir -p '%s' '%s'" % (outdir, logdir)):
-        raise RuntimeError('error making directories')
+    if os.system("eos root://cceos.ihep.ac.cn:1094 mkdir -p %s" % outdirsim):
+        raise RuntimeError('error making remote directories')
+    if os.system("mkdir -p '%s' "% logdir):
+        raise RuntimeError('error making log directories')
     queue = ''
     for nevents, filein in sample.select(target_nevents):
         filename = os.path.basename(filein)
         fileout = os.path.join(outdir, filename.replace('MiniAODv2', 'CustomizedNanoAODv9'))
-        success = check_success(fileout, nevents)
+        #success = check_success(fileout, nevents)
+        success = False
         print('%s %s' % (('Skipping' if success else 'Adding'), fileout))
         if success: continue
         #os.close(os.open(fileout, os.O_WRONLY | os.O_TRUNC))  # truncate

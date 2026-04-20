@@ -34,6 +34,13 @@ PhysicsTools/NanoTuples/scripts/install_onnxruntime.sh
 wget https://coli.web.cern.ch/coli/tmp/.240120-181907_ak8_stage2/model.onnx -O $CMSSW_BASE/src/PhysicsTools/NanoTuples/data/InclParticleTransformer-MD/ak8/V02/model.onnx
 scram b -j$(cat /proc/cpuinfo | grep MHz | wc -l)
 
+filename=$(basename "$FILEOUT")
+cd ../../tmp
+workdir=`pwd`
+path="$workdir/$filename"
+cd ..
+cd CMSSW_10_6_31/src
+
 cmsDriver.py \
     --mc \
     -n "${NEVENT}" \
@@ -46,5 +53,8 @@ cmsDriver.py \
     --era Run2_2016,run2_nanoAOD_106Xv2 \
     --customise PhysicsTools/NanoTuples/nanoTuples_cff.nanoTuples_customizeMC \
     --filein "${FILEIN}" \
-    --fileout "${FILEOUT}" \
     --customise_commands 'process.source.duplicateCheckMode = cms.untracked.string("noDuplicateCheck")' \
+    --fileout "${path}" \
+
+xrdcp --silent -p -f ${path} ${FILEOUT}
+
