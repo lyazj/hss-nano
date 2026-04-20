@@ -225,6 +225,11 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     )
     run2_jme_2016.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
     process.customAK8Table.variables.pt.precision = 10
+    
+    process.fatJetTable.variables.nPFConstituents = Var(
+        "numberOfDaughters()", int,
+        doc="Number of PF candidate constituents"
+    )
 
     # add DeepAK8 scores: nominal
     for prob in _pfDeepBoostedJetTagsProbs:
